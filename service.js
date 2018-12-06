@@ -64,8 +64,13 @@ exports.getBookById = (req,res) => {
 
 exports.editBook = (req,res) => {
   let info = req.body;
-  let sql = 'update book set name=?,author=?,category=?,description=? where id=?';
-  let data = [info.name,info.author,info.category,info.description,info.id];
+  let sql = `update book set name=?,author=?,category=?,description=?${info.img?',img=?':''} where id=?`;
+  let data = [];
+  if (info.img) {
+    data.push(info.name,info.author,info.category,info.description,info.img,info.id);
+  }else {
+    data.push(info.name,info.author,info.category,info.description,info.id);
+  }
   // db.base(sql,data,(result)=>{
   //     if(result.affectedRows == 1){
   //         res.json({flag : 1});
@@ -108,7 +113,17 @@ exports.deleteBook = (req,res) => {
   return;
 };
 
+exports.upLoadBook = (req,res) => {
+  let files = req.files;
+  let url = [];
+  for (let i=0;i<files.length;i++) {
+    url.push(`/uploads/${files[i].filename}`);
+  }
+  res.json({ code : 200, url })
+};
 
+
+// ============== 以下与图书管理无关，单图和多图的上传功能 =================
 // 上传图片
 exports.upLoadImg = (req,res) => {
   let files = req.files;
